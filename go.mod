@@ -1,4 +1,4 @@
-module tyrion85/pod-deleter
+module tyrion85/pod-cleaner
 
 go 1.18
 

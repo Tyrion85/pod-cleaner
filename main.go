@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"strings"
-	"tyrion85/pod-deleter/controllers"
+	"tyrion85/pod-cleaner/controllers"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -95,7 +95,7 @@ func main() {
 		HealthProbeBindAddress:  viper.GetString("probe-addr"),
 		LeaderElection:          viper.GetBool("enable-leader-election"),
 		LeaderElectionNamespace: viper.GetString("leader-election-namespace"),
-		LeaderElectionID:        "pod-deleter.tyrion85.com",
+		LeaderElectionID:        "pod-cleaner.tyrion85.com",
 	}
 
 	ns := strings.Split(viper.GetString("namespaces"), ",")
