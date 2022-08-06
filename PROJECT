@@ -1,0 +1,12 @@
+domain: tyrion85
+layout:
+- go.kubebuilder.io/v4-alpha
+projectName: pod-deleter
+repo: tyrion85/pod-deleter
+resources:
+- controller: true
+  domain: tyrion85
+  group: deleter
+  kind: PodDeleter
+  version: v1
+version: "3"
