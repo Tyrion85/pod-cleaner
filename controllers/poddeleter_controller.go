@@ -74,10 +74,7 @@ func (r *PodDeleterReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return reconcile.Result{}, err
 	}
 
-	if pod.Status.Phase == corev1.PodFailed &&
-		(pod.Status.Reason == "Terminated" && strings.Contains(pod.Status.Message, "node shutdown")) ||
-		(pod.Status.Reason == "NodeShutdown" && strings.Contains(pod.Status.Message, "node is shutting down")) {
-		// delete pod
+	if shouldDelete(&pod) {
 		logger.Info("deleting pod")
 		if err = r.deletePod(ctx, &pod); err != nil {
 			logger.Error(err, "failed to delete pod", pod, pod.Name)
@@ -86,6 +83,20 @@ func (r *PodDeleterReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		logger.Info("pod deleted")
 	}
 	return ctrl.Result{}, nil
+}
+
+func shouldDelete(pod *corev1.Pod) bool {
+	// preemptible nodes cleanup
+	if pod.Status.Phase == corev1.PodFailed &&
+		(pod.Status.Reason == "Terminated" && strings.Contains(pod.Status.Message, "node shutdown")) ||
+		(pod.Status.Reason == "NodeShutdown" && strings.Contains(pod.Status.Message, "node is shutting down")) {
+		return true
+	}
+	// nodeaffinity failure cleanup
+	if pod.Status.Phase == "Failed" && pod.Status.Reason == "NodeAffinity" && strings.Contains(pod.Status.Message, "Pod Predicate NodeAffinity failed") {
+		return true
+	}
+	return false
 }
 
 func (r *PodDeleterReconciler) deletePod(ctx context.Context, pod *corev1.Pod) error {
